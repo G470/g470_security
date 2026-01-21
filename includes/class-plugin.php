@@ -40,6 +40,13 @@ class G470_Security_Plugin {
 	protected $rest_security;
 
 	/**
+	 * Plugin updater instance.
+	 *
+	 * @var G470_Security_Updater
+	 */
+	protected $updater;
+
+	/**
 	 * Initialize the plugin.
 	 *
 	 * Load dependencies and set up hooks.
@@ -67,6 +74,10 @@ class G470_Security_Plugin {
 		// Admin classes.
 		require_once G470_SECURITY_PATH . 'admin/class-settings.php';
 		require_once G470_SECURITY_PATH . 'admin/class-admin.php';
+
+		// Updater classes.
+		require_once G470_SECURITY_PATH . 'updater/class-github-api.php';
+		require_once G470_SECURITY_PATH . 'updater/class-updater.php';
 	}
 
 	/**
@@ -89,6 +100,9 @@ class G470_Security_Plugin {
 
 		// REST API security (always active).
 		$this->rest_security = new G470_Security_REST_Security( $this->settings );
+
+		// Plugin updater (always active).
+		$this->updater = new G470_Security_Updater( $this->settings );
 	}
 
 	/**
@@ -131,5 +145,15 @@ class G470_Security_Plugin {
 	 */
 	public function get_rest_security() {
 		return $this->rest_security;
+	}
+
+	/**
+	 * Get the updater instance.
+	 *
+	 * @since  1.0.0
+	 * @return G470_Security_Updater Updater instance.
+	 */
+	public function get_updater() {
+		return $this->updater;
 	}
 }

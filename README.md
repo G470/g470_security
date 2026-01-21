@@ -9,6 +9,7 @@ Small utility plugin that protects the REST users endpoint. By default it blocks
 - Settings stored in a single option `g470_security_options` with safe defaults and sanitization. Capability is selected from a dropdown of available site capabilities.
 - Activation seeds defaults; deactivation removes the option.
 - **Modular architecture:** Easy to extend with additional security features, admin components, and future GitHub-based updates.
+- **GitHub-based updates:** Configure a GitHub repository to receive automatic plugin updates from releases.
 
 ## Installation
 
@@ -18,9 +19,15 @@ Small utility plugin that protects the REST users endpoint. By default it blocks
 
 ## Settings
 
+### REST API Protection
 - Enable Protection: on/off switch (default: on).
 - Required Capability: capability string used for access (default: `list_users`). Selected from dropdown of available site capabilities.
-- Storage: WordPress database option `g470_security_options`.
+
+### Plugin Updates
+- GitHub Repository: Full repository URL (e.g., `https://github.com/yourusername/g470_security`).
+- GitHub Token: Optional Personal Access Token for private repositories.
+
+All settings stored in WordPress database option `g470_security_options`.
 
 ## Behavior
 
@@ -53,6 +60,30 @@ The plugin now follows a modular class-based architecture. See [docs/g470_securi
 - Extend logic: add your own `rest_pre_dispatch` filter with a lower priority than `G470_Security_REST_Security::filter_users_endpoint()` (it runs at priority 10).
 - Localization: text domain `g470-gatonet-plugins`; add `.po`/`.mo` files to `languages/` directory.
 
+### Setting Up GitHub Updates
+
+1. **Create a GitHub Repository** (public or private) for your plugin.
+2. **Configure in Settings:**
+   - Go to Settings → G470 Security → Plugin Update Settings
+   - Enter your repository URL: `https://github.com/yourusername/g470_security`
+   - For private repos: Add a GitHub Personal Access Token with `repo` scope
+3. **Create Releases:**
+   - Tag your releases with version numbers (e.g., `v1.0.1`, `v1.1.0`)
+   - WordPress will check for updates every 12 hours
+   - Updates appear in Dashboard → Updates like any other plugin
+
+**Example: Creating a release**
+```bash
+# Tag the current commit
+git tag v1.0.1
+
+# Push the tag to GitHub
+git push origin v1.0.1
+
+# Or create a release via GitHub UI
+# Go to Releases → Draft a new release → Create tag v1.0.1
+```
+
 ## Testing quick steps
 
 1) Logged out request to `/wp-json/wp/v2/users` → expect 401.
@@ -61,4 +92,4 @@ The plugin now follows a modular class-based architecture. See [docs/g470_securi
 
 ## Changelog
 
-- **1.0.0** (2026-01-21): Modular architecture release with class-based design, separation of concerns, and extensibility framework.
+- **1.0.0** (2026-01-21): Modular architecture release with class-based design, separation of concerns, extensibility framework, and GitHub-based updater system.

@@ -55,8 +55,10 @@ class G470_Security_Settings {
 	 */
 	public function get_defaults() {
 		return array(
-			'g470_security_enabled'    => true,
-			'g470_security_capability' => 'list_users',
+			'g470_security_enabled'      => true,
+			'g470_security_capability'   => 'list_users',
+			'g470_security_github_repo'  => '',
+			'g470_security_github_token' => '',
 		);
 	}
 
@@ -104,6 +106,29 @@ class G470_Security_Settings {
 			$this->settings_page,
 			'g470_security_main_section'
 		);
+
+		add_settings_section(
+			'g470_security_updater_section',
+			__( 'Plugin Update Settings', 'g470-gatonet-plugins' ),
+			array( $this, 'render_updater_section_description' ),
+			$this->settings_page
+		);
+
+		add_settings_field(
+			'g470_security_github_repo',
+			__( 'GitHub Repository', 'g470-gatonet-plugins' ),
+			array( $this, 'render_github_repo_field' ),
+			$this->settings_page,
+			'g470_security_updater_section'
+		);
+
+		add_settings_field(
+			'g470_security_github_token',
+			__( 'GitHub Token', 'g470-gatonet-plugins' ),
+			array( $this, 'render_github_token_field' ),
+			$this->settings_page,
+			'g470_security_updater_section'
+		);
 	}
 
 	/**
@@ -130,6 +155,20 @@ class G470_Security_Settings {
 				: $defaults['g470_security_capability'];
 		} else {
 			$output['g470_security_capability'] = $defaults['g470_security_capability'];
+		}
+
+		// Sanitize GitHub repository URL.
+		if ( isset( $input['g470_security_github_repo'] ) ) {
+			$output['g470_security_github_repo'] = esc_url_raw( trim( $input['g470_security_github_repo'] ) );
+		} else {
+			$output['g470_security_github_repo'] = '';
+		}
+
+		// Sanitize GitHub token (keep private).
+		if ( isset( $input['g470_security_github_token'] ) ) {
+			$output['g470_security_github_token'] = sanitize_text_field( trim( $input['g470_security_github_token'] ) );
+		} else {
+			$output['g470_security_github_token'] = '';
 		}
 
 		return $output;
@@ -174,6 +213,58 @@ class G470_Security_Settings {
 		</select>
 		<p class="description">
 			<?php esc_html_e( 'Users must have this capability to access the users endpoint.', 'g470-gatonet-plugins' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render updater section description.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_updater_section_description() {
+		?>
+		<p><?php esc_html_e( 'Configure GitHub repository for automatic plugin updates. Leave blank to disable.', 'g470-gatonet-plugins' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Render the GitHub repository URL field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_github_repo_field() {
+		$options = $this->get_options();
+		?>
+		<input type="url"
+		       id="g470_security_github_repo"
+		       name="<?php echo esc_attr( $this->option_name ); ?>[g470_security_github_repo]"
+		       value="<?php echo esc_attr( isset( $options['g470_security_github_repo'] ) ? $options['g470_security_github_repo'] : '' ); ?>"
+		       class="regular-text"
+		       placeholder="https://github.com/owner/repo" />
+		<p class="description">
+			<?php esc_html_e( 'Full GitHub repository URL (e.g., https://github.com/yourusername/g470_security)', 'g470-gatonet-plugins' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render the GitHub token field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_github_token_field() {
+		$options = $this->get_options();
+		$token   = isset( $options['g470_security_github_token'] ) ? $options['g470_security_github_token'] : '';
+		?>
+		<input type="password"
+		       id="g470_security_github_token"
+		       name="<?php echo esc_attr( $this->option_name ); ?>[g470_security_github_token]"
+		       value="<?php echo esc_attr( $token ); ?>"
+		       class="regular-text"
+		       placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+		<p class="description">
+			<?php esc_html_e( 'Optional. GitHub Personal Access Token (required for private repositories). Keep this secret!', 'g470-gatonet-plugins' ); ?>
 		</p>
 		<?php
 	}
