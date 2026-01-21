@@ -22,10 +22,12 @@ Small utility plugin that protects the REST users endpoint. By default it blocks
 ## Settings
 
 ### General Settings Tab
+
 - **GitHub Repository:** Full repository URL for automatic plugin updates (e.g., `https://github.com/yourusername/g470_security`)
 - **GitHub Token:** Optional Personal Access Token for private repositories
 
 ### Available Patches Tab
+
 - Lists all security modules and patches
 - **REST Users Protection:** Core module (always active, locked)
   - Click "Configure Settings" to access module-specific configuration:

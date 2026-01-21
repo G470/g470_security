@@ -262,9 +262,10 @@ class G470_Security_Admin {
 				$result['message']     = __( 'Blocked: logged-in without required capability receive 403.', 'g470-gatonet-plugins' );
 				wp_send_json_success( $result );
 			}
-				$result['http_status'] = 200;
-				$result['message']     = __( 'Access allowed but data will be sanitized for unauthorized users.', 'g470-gatonet-plugins' );
-			}
+
+			$result['outcome']     = 'allowed';
+			$result['http_status'] = 200;
+			$result['message']     = __( 'Access allowed but data will be sanitized for unauthorized users.', 'g470-gatonet-plugins' );
 			wp_send_json_success( $result );
 		}
 
