@@ -84,38 +84,42 @@ $modules        = $module_manager->get_modules();
 		</div>
 
 		<script type="text/javascript">
-		jQuery(document).ready(function($) {
-			$('.g470-module-toggle-input').on('change', function() {
-				var $checkbox = $(this);
-				var moduleId = $checkbox.data('module-id');
-				var isEnabled = $checkbox.is(':checked');
-
-				// Send AJAX request to toggle module
-				$.ajax({
-					url: ajaxurl,
-					type: 'POST',
-					data: {
-						action: 'g470_toggle_module',
-						module_id: moduleId,
-						enabled: isEnabled ? 1 : 0,
-						nonce: '<?php echo esc_js( wp_create_nonce( 'g470_toggle_module' ) ); ?>'
-					},
-					success: function(response) {
-						if (response.success) {
-							// Reload page to show/hide settings links
-							location.reload();
-						} else {
-							alert(response.data.message || '<?php esc_html_e( 'Failed to toggle module.', 'g470-gatonet-plugins' ); ?>');
-							$checkbox.prop('checked', !isEnabled);
-						}
-					},
-					error: function() {
-						alert('<?php esc_html_e( 'An error occurred. Please try again.', 'g470-gatonet-plugins' ); ?>');
-						$checkbox.prop('checked', !isEnabled);
-					}
+		(function() {
+			document.addEventListener('DOMContentLoaded', function() {
+				const toggles = document.querySelectorAll('.g470-module-toggle-input');
+				
+				toggles.forEach(function(checkbox) {
+					checkbox.addEventListener('change', function() {
+						const moduleId = this.dataset.moduleId;
+						const isEnabled = this.checked;
+						
+						const formData = new FormData();
+						formData.append('action', 'g470_toggle_module');
+						formData.append('module_id', moduleId);
+						formData.append('enabled', isEnabled ? 1 : 0);
+						formData.append('nonce', '<?php echo esc_js( wp_create_nonce( 'g470_toggle_module' ) ); ?>');
+						
+						fetch(ajaxurl, {
+							method: 'POST',
+							body: formData
+						})
+						.then(response => response.json())
+						.then(response => {
+							if (response.success) {
+								location.reload();
+							} else {
+								alert(response.data.message || '<?php esc_html_e( 'Failed to toggle module.', 'g470-gatonet-plugins' ); ?>');
+								checkbox.checked = !isEnabled;
+							}
+						})
+						.catch(() => {
+							alert('<?php esc_html_e( 'An error occurred. Please try again.', 'g470-gatonet-plugins' ); ?>');
+							checkbox.checked = !isEnabled;
+						});
+					});
 				});
 			});
-		});
+		})();
 		</script>
 
 	<?php else : ?>

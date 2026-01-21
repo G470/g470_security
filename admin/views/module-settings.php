@@ -77,47 +77,55 @@ if ( ! $module ) {
 		<div id="g470-test-result" style="margin-top:10px;"></div>
 
 		<script type="text/javascript">
-			(function($){
-				var $btn = $('#g470-test-button');
-				var $spinner = $('#g470-test-spinner');
-				var $result = $('#g470-test-result');
-				var nonce = '<?php echo esc_js( wp_create_nonce( 'g470_test_rest_users_protection' ) ); ?>';
-				$btn.on('click', function(e){
+			(function(){
+				const btn = document.getElementById('g470-test-button');
+				const spinner = document.getElementById('g470-test-spinner');
+				const result = document.getElementById('g470-test-result');
+				const scenarioSelect = document.getElementById('g470-test-scenario');
+				const nonce = '<?php echo esc_js( wp_create_nonce( 'g470_test_rest_users_protection' ) ); ?>';
+				
+				btn.addEventListener('click', function(e){
 					e.preventDefault();
-					$btn.prop('disabled', true);
-					$spinner.css('visibility', 'visible');
-					$result.text('<?php echo esc_js( __( 'Testing...', 'g470-gatonet-plugins' ) ); ?>');
-					var scenario = $('#g470-test-scenario').val();
-					$.post(ajaxurl, {
-						action: 'g470_test_rest_users_protection',
-						nonce: nonce,
-						scenario: scenario
+					btn.disabled = true;
+					spinner.style.visibility = 'visible';
+					result.textContent = '<?php echo esc_js( __( 'Testing...', 'g470-gatonet-plugins' ) ); ?>';
+					const scenario = scenarioSelect.value;
+					
+					const formData = new FormData();
+					formData.append('action', 'g470_test_rest_users_protection');
+					formData.append('nonce', nonce);
+					formData.append('scenario', scenario);
+					
+					fetch(ajaxurl, {
+						method: 'POST',
+						body: formData
 					})
-					.done(function(resp){
+					.then(response => response.json())
+					.then(resp => {
 						if (resp && resp.success && resp.data) {
-							var data = resp.data;
-							var labelMap = {
+							const data = resp.data;
+							const labelMap = {
 								current: '<?php echo esc_js( __( 'Current User', 'g470-gatonet-plugins' ) ); ?>',
 								guest: '<?php echo esc_js( __( 'Guest', 'g470-gatonet-plugins' ) ); ?>',
 								no_cap: '<?php echo esc_js( __( 'No Capability', 'g470-gatonet-plugins' ) ); ?>',
 								has_cap: '<?php echo esc_js( __( 'Has Required Capability', 'g470-gatonet-plugins' ) ); ?>'
 							};
-							var scenarioLabel = labelMap[data.scenario] || data.scenario;
-							var msg = '[' + scenarioLabel + '] ' + data.message + ' ' + '(status: ' + data.http_status + ', mode: ' + data.protection_mode + ', required cap: ' + data.required_cap + ')';
-							$result.text(msg);
+							const scenarioLabel = labelMap[data.scenario] || data.scenario;
+							const msg = '[' + scenarioLabel + '] ' + data.message + ' ' + '(status: ' + data.http_status + ', mode: ' + data.protection_mode + ', required cap: ' + data.required_cap + ')';
+							result.textContent = msg;
 						} else {
-							$result.text('<?php echo esc_js( __( 'Test failed. Please try again.', 'g470-gatonet-plugins' ) ); ?>');
+							result.textContent = '<?php echo esc_js( __( 'Test failed. Please try again.', 'g470-gatonet-plugins' ) ); ?>';
 						}
 					})
-					.fail(function(){
-						$result.text('<?php echo esc_js( __( 'Request error. Please check your network.', 'g470-gatonet-plugins' ) ); ?>');
+					.catch(() => {
+						result.textContent = '<?php echo esc_js( __( 'Request error. Please check your network.', 'g470-gatonet-plugins' ) ); ?>';
 					})
-					.always(function(){
-						$btn.prop('disabled', false);
-						$spinner.css('visibility', 'hidden');
+					.finally(() => {
+						btn.disabled = false;
+						spinner.style.visibility = 'hidden';
 					});
 				});
-			})(jQuery);
+			})();
 		</script>
 	<?php endif; ?>
 </div>
