@@ -98,4 +98,5 @@ git push origin v1.0.1
 
 ## Changelog
 
+- **1.0.1** (2026-01-21): Version bump release to publish a new GitHub tag so WordPress installations can see the available update.
 - **1.0.0** (2026-01-21): Modular architecture release with class-based design, separation of concerns, extensibility framework, GitHub-based updater system, and tabbed settings interface with module management.
