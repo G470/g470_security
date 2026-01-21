@@ -59,7 +59,7 @@ class G470_Security_Module_Manager {
 				'enabled'     => true,
 				'locked'      => true, // Cannot be disabled (core feature)
 				'has_settings' => true,
-				'settings_callback' => null, // Uses main settings page
+				'settings_callback' => null, // Uses dedicated module settings page
 				'class'       => 'G470_Security_REST_Security',
 			)
 		);

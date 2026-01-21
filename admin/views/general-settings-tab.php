@@ -1,6 +1,6 @@
 <?php
 /**
- * General Settings Tab.
+ * General Settings Tab - Plugin Update Settings Only.
  *
  * @package    G470_Security
  * @subpackage G470_Security/admin/views

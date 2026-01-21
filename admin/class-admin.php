@@ -101,11 +101,19 @@ class G470_Security_Admin {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'g470-gatonet-plugins' ) );
 		}
 
-		// Get current tab
-		$current_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general';
+		// Check if displaying module settings page
+		$module_id = isset( $_GET['module'] ) ? sanitize_key( $_GET['module'] ) : '';
 
-		// Load the view template.
-		include G470_SECURITY_PATH . 'admin/views/settings-page.php';
+		if ( ! empty( $module_id ) ) {
+			// Load module-specific settings page
+			include G470_SECURITY_PATH . 'admin/views/module-settings.php';
+		} else {
+			// Get current tab for tabbed interface
+			$current_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general';
+
+			// Load the main tabbed settings page
+			include G470_SECURITY_PATH . 'admin/views/settings-page.php';
+		}
 	}
 
 	/**

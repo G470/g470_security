@@ -84,29 +84,31 @@ class G470_Security_Settings {
 			array( $this, 'sanitize_options' )
 		);
 
+		// === REST Users Protection Settings (Module-specific) ===
 		add_settings_section(
-			'g470_security_main_section',
-			__( 'REST API Protection Settings', 'g470-gatonet-plugins' ),
+			'g470_security_rest_users_section',
+			__( 'REST Users Endpoint Protection', 'g470-gatonet-plugins' ),
 			null,
-			$this->settings_page
+			'g470_security_rest_users_settings'
 		);
 
 		add_settings_field(
 			'g470_security_enabled',
 			__( 'Enable Protection', 'g470-gatonet-plugins' ),
 			array( $this, 'render_enabled_field' ),
-			$this->settings_page,
-			'g470_security_main_section'
+			'g470_security_rest_users_settings',
+			'g470_security_rest_users_section'
 		);
 
 		add_settings_field(
 			'g470_security_capability',
 			__( 'Required Capability', 'g470-gatonet-plugins' ),
 			array( $this, 'render_capability_field' ),
-			$this->settings_page,
-			'g470_security_main_section'
+			'g470_security_rest_users_settings',
+			'g470_security_rest_users_section'
 		);
 
+		// === Plugin Update Settings (General Tab) ===
 		add_settings_section(
 			'g470_security_updater_section',
 			__( 'Plugin Update Settings', 'g470-gatonet-plugins' ),
