@@ -55,20 +55,23 @@ $modules        = $module_manager->get_modules();
 						<div class="g470-module-settings-link">
 							<?php
 							// Build settings URL
+							// When settings_callback is defined, use custom callback
+							// Otherwise, link to dedicated module settings page
 							if ( ! empty( $module['settings_callback'] ) ) {
-								$settings_url = add_query_arg(
-									array(
-										'page'   => 'g470-security-settings',
-										'module' => $module_id,
-									),
-									admin_url( 'options-general.php' )
-								);
-							} else {
-								// Core module uses general tab
+								// Custom settings via callback (future use)
 								$settings_url = add_query_arg(
 									array(
 										'page' => 'g470-security-settings',
 										'tab'  => 'general',
+									),
+									admin_url( 'options-general.php' )
+								);
+							} else {
+								// Dedicated module settings page
+								$settings_url = add_query_arg(
+									array(
+										'page'   => 'g470-security-settings',
+										'module' => $module_id,
 									),
 									admin_url( 'options-general.php' )
 								);
