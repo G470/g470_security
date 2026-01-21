@@ -61,7 +61,8 @@ class G470_Security_Plugin {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->load_textdomain();
+		// Defer translations loading to 'init' per WP 6.7 guidance.
+		add_action( 'init', array( $this, 'load_textdomain' ) );
 		$this->load_dependencies();
 		$this->instantiate_modules();
 	}
@@ -72,7 +73,7 @@ class G470_Security_Plugin {
 	 * @since  1.0.0
 	 * @access private
 	 */
-	private function load_textdomain() {
+	public function load_textdomain() {
 		load_plugin_textdomain(
 			'g470-gatonet-plugins',
 			false,
