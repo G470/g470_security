@@ -5,6 +5,8 @@ Small utility plugin that protects the REST users endpoint. By default it blocks
 ## Features
 
 - Restricts `/wp/v2/users` via `rest_pre_dispatch`; returns `401` for guests and `403` for logged-in users lacking the capability.
+- **Tabbed settings interface:** Organized settings with General Settings and Available Patches tabs.
+- **Modular patch system:** Enable/disable security modules with individual configuration options.
 - Admin settings page: Settings → G470 Security with an enable toggle and a required capability field.
 - Settings stored in a single option `g470_security_options` with safe defaults and sanitization. Capability is selected from a dropdown of available site capabilities.
 - Activation seeds defaults; deactivation removes the option.
@@ -92,4 +94,4 @@ git push origin v1.0.1
 
 ## Changelog
 
-- **1.0.0** (2026-01-21): Modular architecture release with class-based design, separation of concerns, extensibility framework, and GitHub-based updater system.
+- **1.0.0** (2026-01-21): Modular architecture release with class-based design, separation of concerns, extensibility framework, GitHub-based updater system, and tabbed settings interface with module management.
