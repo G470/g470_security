@@ -61,6 +61,14 @@ if ( ! $module ) {
 		<p class="description">
 			<?php esc_html_e( 'Click to simulate access outcome for the current user with the saved settings.', 'g470-gatonet-plugins' ); ?>
 		</p>
+		<label for="g470-test-scenario" style="margin-right:8px;">
+			<?php esc_html_e( 'Scenario:', 'g470-gatonet-plugins' ); ?>
+		</label>
+		<select id="g470-test-scenario" class="regular-text" style="width:auto; margin-right:8px;">
+			<option value="current"><?php esc_html_e( 'Current User', 'g470-gatonet-plugins' ); ?></option>
+			<option value="guest"><?php esc_html_e( 'Guest (not logged in)', 'g470-gatonet-plugins' ); ?></option>
+			<option value="no_cap"><?php esc_html_e( 'Logged-in without required capability', 'g470-gatonet-plugins' ); ?></option>
+		</select>
 		<button id="g470-test-button" class="button">
 			<?php esc_html_e( 'Run Test', 'g470-gatonet-plugins' ); ?>
 		</button>
@@ -78,14 +86,22 @@ if ( ! $module ) {
 					$btn.prop('disabled', true);
 					$spinner.css('visibility', 'visible');
 					$result.text('<?php echo esc_js( __( 'Testing...', 'g470-gatonet-plugins' ) ); ?>');
+					var scenario = $('#g470-test-scenario').val();
 					$.post(ajaxurl, {
 						action: 'g470_test_rest_users_protection',
-						nonce: nonce
+						nonce: nonce,
+						scenario: scenario
 					})
 					.done(function(resp){
 						if (resp && resp.success && resp.data) {
 							var data = resp.data;
-							var msg = data.message + ' ' + '(status: ' + data.http_status + ', mode: ' + data.protection_mode + ', required cap: ' + data.required_cap + ')';
+							var labelMap = {
+								current: '<?php echo esc_js( __( 'Current User', 'g470-gatonet-plugins' ) ); ?>',
+								guest: '<?php echo esc_js( __( 'Guest', 'g470-gatonet-plugins' ) ); ?>',
+								no_cap: '<?php echo esc_js( __( 'No Capability', 'g470-gatonet-plugins' ) ); ?>'
+							};
+							var scenarioLabel = labelMap[data.scenario] || data.scenario;
+							var msg = '[' + scenarioLabel + '] ' + data.message + ' ' + '(status: ' + data.http_status + ', mode: ' + data.protection_mode + ', required cap: ' + data.required_cap + ')';
 							$result.text(msg);
 						} else {
 							$result.text('<?php echo esc_js( __( 'Test failed. Please try again.', 'g470-gatonet-plugins' ) ); ?>');

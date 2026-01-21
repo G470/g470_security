@@ -206,6 +206,9 @@ class G470_Security_Admin {
 
 		$options = $this->settings->get_options();
 
+		// Determine scenario: current (default), guest, or no_cap.
+		$scenario = isset( $_POST['scenario'] ) ? sanitize_key( wp_unslash( $_POST['scenario'] ) ) : 'current';
+
 		$enabled         = ! empty( $options['g470_security_enabled'] );
 		$required_cap    = ! empty( $options['g470_security_capability'] ) ? $options['g470_security_capability'] : 'list_users';
 		$protection_mode = ! empty( $options['g470_security_protection_mode'] ) ? $options['g470_security_protection_mode'] : 'block';
@@ -213,12 +216,32 @@ class G470_Security_Admin {
 		$current_is_logged_in = is_user_logged_in();
 		$current_has_cap      = $current_is_logged_in && current_user_can( $required_cap );
 
+		// Simulate based on scenario.
+		$sim_is_logged_in = $current_is_logged_in;
+		$sim_has_cap      = $current_has_cap;
+
+		switch ( $scenario ) {
+			case 'guest':
+				$sim_is_logged_in = false;
+				$sim_has_cap      = false;
+				break;
+			case 'no_cap':
+				$sim_is_logged_in = true;
+				$sim_has_cap      = false;
+				break;
+			case 'current':
+			default:
+				// Use actual current user context.
+				break;
+		}
+
 		$result = array(
 			'enabled'         => $enabled,
 			'protection_mode' => $protection_mode,
 			'required_cap'    => $required_cap,
-			'is_logged_in'    => $current_is_logged_in,
-			'has_cap'         => $current_has_cap,
+			'scenario'        => $scenario,
+			'is_logged_in'    => $sim_is_logged_in,
+			'has_cap'         => $sim_has_cap,
 		);
 
 		if ( ! $enabled ) {
@@ -229,12 +252,12 @@ class G470_Security_Admin {
 		}
 
 		if ( 'sanitize' === $protection_mode ) {
-			if ( $current_has_cap ) {
-				$result['outcome']     = 'allowed';
-				$result['http_status'] = 200;
-				$result['message']     = __( 'Access allowed. Data will be full for authorized users.', 'g470-gatonet-plugins' );
-			} else {
-				$result['outcome']     = 'sanitized';
+			if ( ! $sim_has_cap ) {
+				$result['outcome']     = 'blocked';
+				$result['http_status'] = 403;
+				$result['message']     = __( 'Blocked: logged-in without required capability receive 403.', 'g470-gatonet-plugins' );
+				wp_send_json_success( $result );
+			}
 				$result['http_status'] = 200;
 				$result['message']     = __( 'Access allowed but data will be sanitized for unauthorized users.', 'g470-gatonet-plugins' );
 			}
@@ -242,14 +265,14 @@ class G470_Security_Admin {
 		}
 
 		// Block mode.
-		if ( ! $current_is_logged_in ) {
+		if ( ! $sim_is_logged_in ) {
 			$result['outcome']     = 'blocked';
 			$result['http_status'] = 401;
 			$result['message']     = __( 'Blocked: guest users receive 401.', 'g470-gatonet-plugins' );
 			wp_send_json_success( $result );
 		}
 
-		if ( ! $current_has_cap ) {
+		if ( ! $sim_has_cap ) {
 			$result['outcome']     = 'blocked';
 			$result['http_status'] = 403;
 			$result['message']     = __( 'Blocked: logged-in without required capability receive 403.', 'g470-gatonet-plugins' );
