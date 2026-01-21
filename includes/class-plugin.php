@@ -47,6 +47,13 @@ class G470_Security_Plugin {
 	protected $updater;
 
 	/**
+	 * Module manager instance.
+	 *
+	 * @var G470_Security_Module_Manager
+	 */
+	protected $module_manager;
+
+	/**
 	 * Initialize the plugin.
 	 *
 	 * Load dependencies and set up hooks.
@@ -69,6 +76,7 @@ class G470_Security_Plugin {
 	private function load_dependencies() {
 		// Security classes.
 		require_once G470_SECURITY_PATH . 'security/class-capability-manager.php';
+		require_once G470_SECURITY_PATH . 'security/class-module-manager.php';
 		require_once G470_SECURITY_PATH . 'security/class-rest-security.php';
 
 		// Admin classes.
@@ -93,9 +101,12 @@ class G470_Security_Plugin {
 		// Settings must be instantiated first (other modules depend on it).
 		$this->settings = new G470_Security_Settings();
 
+		// Module manager (depends on settings).
+		$this->module_manager = new G470_Security_Module_Manager( $this->settings );
+
 		// Admin UI.
 		if ( is_admin() ) {
-			$this->admin = new G470_Security_Admin( $this->settings );
+			$this->admin = new G470_Security_Admin( $this->settings, $this->module_manager );
 		}
 
 		// REST API security (always active).
@@ -155,5 +166,15 @@ class G470_Security_Plugin {
 	 */
 	public function get_updater() {
 		return $this->updater;
+	}
+
+	/**
+	 * Get the module manager instance.
+	 *
+	 * @since  1.0.0
+	 * @return G470_Security_Module_Manager Module manager instance.
+	 */
+	public function get_module_manager() {
+		return $this->module_manager;
 	}
 }
