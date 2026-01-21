@@ -23,7 +23,7 @@ $modules        = $module_manager->get_modules();
 				<?php
 				$is_enabled = $module_manager->is_module_enabled( $module_id );
 				$is_locked  = ! empty( $module['locked'] );
-				$item_class = $is_locked ? 'g470-module-item g470-module-locked card' : ' g470-module-item card';
+				$item_class = $is_locked ? 'g470-module-item g470-module-locked card' : 'g470-module-item card';
 				?>
 				<div class="<?php echo esc_attr( $item_class ); ?>" data-module-id="<?php echo esc_attr( $module_id ); ?>">
 					<div class="g470-module-header">

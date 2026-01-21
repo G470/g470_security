@@ -137,11 +137,15 @@ class G470_Security_REST_Security {
 
 		// Sanitize the response data.
 		$data = $response->get_data();
+		$user_id = isset( $data['id'] ) ? absint( $data['id'] ) : 0;
+		// Normalize user ID to an integer to prevent injection via the ID field.
+		$user_id = isset( $data['id'] ) ? (int) $data['id'] : 0;
 
 		// Replace sensitive fields with generic placeholders.
 		$sanitized_fields = array(
-			'name'        => __( 'User', 'g470-gatonet-plugins' ) . ' #' . $data['id'],
-			'slug'        => 'user-' . $data['id'],
+			'name'        => __( 'User', 'g470-gatonet-plugins' ) . ' #' . $user_id,
+			'slug'        => sanitize_title( 'user-' . $user_id ),
+			'slug'        => 'user-' . $user_id,
 			'description' => '',
 			'link'        => '',
 		);
