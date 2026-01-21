@@ -57,7 +57,7 @@ class G470_Security_Module_Manager {
 				'name'        => __( 'REST Users Protection', 'g470-gatonet-plugins' ),
 				'description' => __( 'Restrict access to /wp/v2/users REST endpoint based on capabilities.', 'g470-gatonet-plugins' ),
 				'enabled'     => true,
-				'locked'      => true, // Cannot be disabled (core feature)
+				'locked'      => false, // Can be disabled by admin
 				'has_settings' => true,
 				'settings_callback' => null, // Uses dedicated module settings page
 				'class'       => 'G470_Security_REST_Security',
@@ -127,6 +127,10 @@ class G470_Security_Module_Manager {
 	/**
 	 * Check if a module is enabled.
 	 *
+	 * For the REST Users Protection module, we check the dedicated
+	 * 'g470_security_enabled' setting. For other modules, we check
+	 * the module-specific setting.
+	 *
 	 * @since  1.0.0
 	 * @param  string $id Module identifier.
 	 * @return bool True if enabled, false otherwise.
@@ -140,12 +144,21 @@ class G470_Security_Module_Manager {
 			return true;
 		}
 
+		// Special handling for REST Users Protection module
+		if ( 'rest_users_protection' === $id ) {
+			return ! empty( $options['g470_security_enabled'] );
+		}
+
 		$option_key = 'g470_security_module_' . $id;
 		return ! empty( $options[ $option_key ] );
 	}
 
 	/**
 	 * Enable a module.
+	 *
+	 * For the REST Users Protection module, we enable the dedicated
+	 * 'g470_security_enabled' setting. For other modules, we use
+	 * the module-specific setting.
 	 *
 	 * @since 1.0.0
 	 * @param string $id Module identifier.
@@ -158,8 +171,15 @@ class G470_Security_Module_Manager {
 			return false;
 		}
 
-		$options                           = $this->settings->get_options();
-		$options[ 'g470_security_module_' . $id ] = true;
+		$options = $this->settings->get_options();
+
+		// Special handling for REST Users Protection module
+		if ( 'rest_users_protection' === $id ) {
+			$options['g470_security_enabled'] = true;
+		} else {
+			$options[ 'g470_security_module_' . $id ] = true;
+		}
+
 		update_option( 'g470_security_options', $options );
 
 		return true;
@@ -167,6 +187,10 @@ class G470_Security_Module_Manager {
 
 	/**
 	 * Disable a module.
+	 *
+	 * For the REST Users Protection module, we disable the dedicated
+	 * 'g470_security_enabled' setting. For other modules, we use
+	 * the module-specific setting.
 	 *
 	 * @since 1.0.0
 	 * @param string $id Module identifier.
@@ -180,7 +204,14 @@ class G470_Security_Module_Manager {
 		}
 
 		$options = $this->settings->get_options();
-		unset( $options[ 'g470_security_module_' . $id ] );
+
+		// Special handling for REST Users Protection module
+		if ( 'rest_users_protection' === $id ) {
+			$options['g470_security_enabled'] = false;
+		} else {
+			unset( $options[ 'g470_security_module_' . $id ] );
+		}
+
 		update_option( 'g470_security_options', $options );
 
 		return true;

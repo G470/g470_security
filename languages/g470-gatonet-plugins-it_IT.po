@@ -1,0 +1,198 @@
+# Italian translation for G470 Security
+# Copyright (C) 2026 G470
+# This file is distributed under the same license as the G470 Security plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: G470 Security 1.0.1\n"
+"Report-Msgid-Bugs-To: https://gatonet.de/wordpress-support\n"
+"POT-Creation-Date: 2026-01-21 12:00+0000\n"
+"PO-Revision-Date: 2026-01-21 12:00+0000\n"
+"Last-Translator: G470 <support@gatonet.de>\n"
+"Language-Team: Italian\n"
+"Language: it_IT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin/class-admin.php:56
+#: admin/class-admin.php:57
+msgid "G470 Security"
+msgstr "G470 Sicurezza"
+
+#: admin/class-admin.php:101
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Non disponi delle autorizzazioni sufficienti per accedere a questa pagina."
+
+#: admin/class-admin.php:127
+msgid "General Settings"
+msgstr "Impostazioni Generali"
+
+#: admin/class-admin.php:128
+msgid "Available Patches"
+msgstr "Patch Disponibili"
+
+#: admin/class-admin.php:150
+msgid "Security check failed."
+msgstr "Controllo di sicurezza fallito."
+
+#: admin/class-admin.php:155
+msgid "Insufficient permissions."
+msgstr "Autorizzazioni insufficienti."
+
+#: admin/class-admin.php:163
+msgid "Invalid module ID."
+msgstr "ID modulo non valido."
+
+#: admin/class-admin.php:174
+msgid "Module toggled successfully."
+msgstr "Modulo attivato/disattivato con successo."
+
+#: admin/class-admin.php:176
+msgid "Failed to toggle module. It may be locked."
+msgstr "Impossibile attivare/disattivare il modulo. Potrebbe essere bloccato."
+
+#: admin/views/patches-tab.php:18
+msgid "Enable or disable security patches/modules. Some modules may have additional configuration options."
+msgstr "Abilita o disabilita patch/moduli di sicurezza. Alcuni moduli potrebbero avere opzioni di configurazione aggiuntive."
+
+#: admin/views/patches-tab.php:34
+msgid "Core module (cannot be disabled)"
+msgstr "Modulo principale (non può essere disabilitato)"
+
+#: admin/views/patches-tab.php:41
+msgid "Always Active"
+msgstr "Sempre Attivo"
+
+#: admin/views/patches-tab.php:48
+msgid "Enabled"
+msgstr "Abilitato"
+
+#: admin/views/patches-tab.php:48
+msgid "Disabled"
+msgstr "Disabilitato"
+
+#: admin/views/patches-tab.php:78
+msgid "Configure Settings"
+msgstr "Configura Impostazioni"
+
+#: admin/views/patches-tab.php:108
+msgid "Failed to toggle module."
+msgstr "Impossibile attivare/disattivare il modulo."
+
+#: admin/views/patches-tab.php:113
+msgid "An error occurred. Please try again."
+msgstr "Si è verificato un errore. Riprova."
+
+#: admin/views/patches-tab.php:122
+msgid "No modules available."
+msgstr "Nessun modulo disponibile."
+
+#: admin/views/module-settings.php:35
+msgid "← Back to Patches"
+msgstr "← Torna alle Patch"
+
+#: admin/views/module-settings.php:51
+msgid "No settings available for this module."
+msgstr "Nessuna impostazione disponibile per questo modulo."
+
+#: admin/class-settings.php:90
+msgid "REST Users Endpoint Protection"
+msgstr "Protezione Endpoint Utenti REST"
+
+#: admin/class-settings.php:97
+msgid "Enable Protection"
+msgstr "Abilita Protezione"
+
+#: admin/class-settings.php:105
+msgid "Required Capability"
+msgstr "Capacità Richiesta"
+
+#: admin/class-settings.php:114
+msgid "Plugin Update Settings"
+msgstr "Impostazioni Aggiornamento Plugin"
+
+#: admin/class-settings.php:121
+msgid "GitHub Repository"
+msgstr "Repository GitHub"
+
+#: admin/class-settings.php:129
+msgid "GitHub Token"
+msgstr "Token GitHub"
+
+#: admin/class-settings.php:193
+msgid "Restrict access to /wp/v2/users REST endpoint"
+msgstr "Limita l'accesso all'endpoint REST /wp/v2/users"
+
+#: admin/class-settings.php:217
+msgid "Users must have this capability to access the users endpoint."
+msgstr "Gli utenti devono avere questa capacità per accedere all'endpoint utenti."
+
+#: admin/class-settings.php:229
+msgid "Configure GitHub repository for automatic plugin updates. Leave blank to disable."
+msgstr "Configura il repository GitHub per gli aggiornamenti automatici del plugin. Lasciare vuoto per disabilitare."
+
+#: admin/class-settings.php:248
+msgid "Full GitHub repository URL (e.g., https://github.com/yourusername/g470_security)"
+msgstr "URL completo del repository GitHub (es. https://github.com/nomeutente/g470_security)"
+
+#: admin/class-settings.php:269
+msgid "Optional. GitHub Personal Access Token (required for private repositories). Keep this secret!"
+msgstr "Opzionale. Token di Accesso Personale GitHub (richiesto per repository privati). Mantienilo segreto!"
+
+#: security/class-module-manager.php:57
+msgid "REST Users Protection"
+msgstr "Protezione Utenti REST"
+
+#: security/class-module-manager.php:58
+msgid "Restrict access to /wp/v2/users REST endpoint based on capabilities."
+msgstr "Limita l'accesso all'endpoint REST /wp/v2/users in base alle capacità."
+
+#: security/class-rest-security.php:74
+msgid "Sorry, you are not allowed to view the users endpoint."
+msgstr "Spiacente, non sei autorizzato a visualizzare l'endpoint utenti."
+
+#: updater/class-updater.php:175
+msgid "No release notes available."
+msgstr "Nessuna nota di rilascio disponibile."
+
+#: updater/class-github-api.php:111
+#: updater/class-github-api.php:145
+msgid "GitHub repository not configured."
+msgstr "Repository GitHub non configurato."
+
+#: updater/class-github-api.php:187
+msgid "GitHub API returned error code %d"
+msgstr "L'API GitHub ha restituito il codice di errore %d"
+
+#: updater/class-github-api.php:196
+msgid "Failed to decode GitHub API response."
+msgstr "Impossibile decodificare la risposta dell'API GitHub."
+
+#: admin/class-settings.php:106
+msgid "Protection Mode"
+msgstr "Modalità di Protezione"
+
+#: admin/class-settings.php:256
+msgid "Block Access"
+msgstr "Blocca Accesso"
+
+#: admin/class-settings.php:257
+msgid "Completely block unauthorized users (returns 401/403 error)"
+msgstr "Blocca completamente gli utenti non autorizzati (restituisce errore 401/403)"
+
+#: admin/class-settings.php:265
+msgid "Sanitize Data"
+msgstr "Anonimizza Dati"
+
+#: admin/class-settings.php:266
+msgid "Allow access but replace sensitive information with generic placeholders"
+msgstr "Consenti l'accesso ma sostituisci le informazioni sensibili con segnaposto generici"
+
+#: admin/class-settings.php:270
+msgid "Choose how to protect the users endpoint. Block mode is more secure, but sanitize mode allows public access while hiding usernames and sensitive data."
+msgstr "Scegli come proteggere l'endpoint utenti. La modalità blocco è più sicura, ma la modalità anonimizzazione consente l'accesso pubblico nascondendo i nomi utente e i dati sensibili."
+
+#: security/class-rest-security.php:114
+msgid "User"
+msgstr "Utente"

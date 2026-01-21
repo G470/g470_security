@@ -79,6 +79,7 @@ class G470_Security_Admin {
 			.g470-nav-tab-wrapper { margin-bottom: 20px; }
 			.g470-tab-content { display: none; }
 			.g470-tab-content.active { display: block; }
+			.tab-patches  { margin-top: 20px; }
 			.g470-module-item { padding: 15px; background: #fff; border: 1px solid #ccd0d4; margin-bottom: 10px; border-radius: 4px; }
 			.g470-module-header { display: flex; align-items: center; justify-content: space-between; }
 			.g470-module-info h3 { margin: 0 0 5px; }
@@ -87,6 +88,12 @@ class G470_Security_Admin {
 			.g470-module-toggle .components-form-toggle { margin: 0; }
 			.g470-module-settings-link { margin-top: 10px; padding-top: 10px; border-top: 1px solid #dcdcde; }
 			.g470-module-locked { opacity: 0.6; }
+			.switch.g470-style-toggleswitch { position: relative; display: inline-block; width: 60px; height: 34px; }
+			.switch.g470-style-toggleswitch input { opacity: 0; width: 0; height: 0; }
+			.switch.g470-style-toggleswitch span { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; overflow: hidden; text-indent: -9999px; }
+			.switch.g470-style-toggleswitch span:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+			.switch.g470-style-toggleswitch input:checked + span { background-color: #2196F3; }
+			.switch.g470-style-toggleswitch input:checked + span:before { transform: translateX(26px); }
 			'
 		);
 	}

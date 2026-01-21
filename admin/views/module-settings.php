@@ -17,8 +17,8 @@ $module_mgr = $this->get_module_manager();
 $module     = $module_mgr->get_module( $module_id );
 
 if ( ! $module ) {
-	wp_safe_remote_get( admin_url( 'options-general.php?page=g470-security-settings' ) );
-	return;
+	wp_safe_redirect( admin_url( 'options-general.php?page=g470-security-settings' ) );
+	exit;
 }
 ?>
 

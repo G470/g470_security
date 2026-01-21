@@ -55,9 +55,10 @@ class G470_Security_Settings {
 	 */
 	public function get_defaults() {
 		return array(
-			'g470_security_enabled'      => true,
-			'g470_security_capability'   => 'list_users',
-			'g470_security_github_repo'  => '',
+			'g470_security_enabled'          => true,
+			'g470_security_protection_mode'  => 'block',
+			'g470_security_capability'       => 'list_users',
+			'g470_security_github_repo'      => '',
 			'g470_security_github_token' => '',
 		);
 	}
@@ -96,6 +97,14 @@ class G470_Security_Settings {
 			'g470_security_enabled',
 			__( 'Enable Protection', 'g470-gatonet-plugins' ),
 			array( $this, 'render_enabled_field' ),
+			'g470_security_rest_users_settings',
+			'g470_security_rest_users_section'
+		);
+
+		add_settings_field(
+			'g470_security_protection_mode',
+			__( 'Protection Mode', 'g470-gatonet-plugins' ),
+			array( $this, 'render_protection_mode_field' ),
 			'g470_security_rest_users_settings',
 			'g470_security_rest_users_section'
 		);
@@ -146,6 +155,16 @@ class G470_Security_Settings {
 
 		// Sanitize enabled checkbox.
 		$output['g470_security_enabled'] = ! empty( $input['g470_security_enabled'] );
+
+		// Sanitize protection mode.
+		if ( isset( $input['g470_security_protection_mode'] ) ) {
+			$mode                                 = sanitize_text_field( $input['g470_security_protection_mode'] );
+			$output['g470_security_protection_mode'] = in_array( $mode, array( 'block', 'sanitize' ), true )
+				? $mode
+				: 'block';
+		} else {
+			$output['g470_security_protection_mode'] = 'block';
+		}
 
 		// Sanitize and validate capability.
 		if ( isset( $input['g470_security_capability'] ) ) {
@@ -215,6 +234,40 @@ class G470_Security_Settings {
 		</select>
 		<p class="description">
 			<?php esc_html_e( 'Users must have this capability to access the users endpoint.', 'g470-gatonet-plugins' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render the protection mode field.
+	 *
+	 * @since 1.0.1
+	 */
+	public function render_protection_mode_field() {
+		$options = $this->get_options();
+		$mode    = isset( $options['g470_security_protection_mode'] ) ? $options['g470_security_protection_mode'] : 'block';
+		?>
+		<fieldset>
+			<label>
+				<input type="radio"
+				       name="<?php echo esc_attr( $this->option_name ); ?>[g470_security_protection_mode]"
+				       value="block"
+				       <?php checked( 'block', $mode ); ?> />
+				<strong><?php esc_html_e( 'Block Access', 'g470-gatonet-plugins' ); ?></strong> -
+				<?php esc_html_e( 'Completely block unauthorized users (returns 401/403 error)', 'g470-gatonet-plugins' ); ?>
+			</label>
+			<br>
+			<label>
+				<input type="radio"
+				       name="<?php echo esc_attr( $this->option_name ); ?>[g470_security_protection_mode]"
+				       value="sanitize"
+				       <?php checked( 'sanitize', $mode ); ?> />
+				<strong><?php esc_html_e( 'Sanitize Data', 'g470-gatonet-plugins' ); ?></strong> -
+				<?php esc_html_e( 'Allow access but replace sensitive information with generic placeholders', 'g470-gatonet-plugins' ); ?>
+			</label>
+		</fieldset>
+		<p class="description">
+			<?php esc_html_e( 'Choose how to protect the users endpoint. Block mode is more secure, but sanitize mode allows public access while hiding usernames and sensitive data.', 'g470-gatonet-plugins' ); ?>
 		</p>
 		<?php
 	}

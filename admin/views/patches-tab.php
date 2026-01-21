@@ -14,7 +14,7 @@ $module_manager = $this->get_module_manager();
 $modules        = $module_manager->get_modules();
 ?>
 
-<div class="g470-tab-content" id="tab-patches">
+<div class="g470-tab-content active tab-patches" id="tab-patches">
 	<p><?php esc_html_e( 'Enable or disable security patches/modules. Some modules may have additional configuration options.', 'g470-gatonet-plugins' ); ?></p>
 
 	<?php if ( ! empty( $modules ) ) : ?>
@@ -23,7 +23,7 @@ $modules        = $module_manager->get_modules();
 				<?php
 				$is_enabled = $module_manager->is_module_enabled( $module_id );
 				$is_locked  = ! empty( $module['locked'] );
-				$item_class = $is_locked ? 'g470-module-item g470-module-locked' : 'g470-module-item';
+				$item_class = $is_locked ? 'g470-module-item g470-module-locked card' : ' g470-module-item card';
 				?>
 				<div class="<?php echo esc_attr( $item_class ); ?>" data-module-id="<?php echo esc_attr( $module_id ); ?>">
 					<div class="g470-module-header">
@@ -40,7 +40,7 @@ $modules        = $module_manager->get_modules();
 							<?php if ( $is_locked ) : ?>
 								<span class="description"><?php esc_html_e( 'Always Active', 'g470-gatonet-plugins' ); ?></span>
 							<?php else : ?>
-								<label class="switch">
+								<label class="switch g470-style-toggleswitch">
 									<input type="checkbox" 
 									       class="g470-module-toggle-input"
 									       data-module-id="<?php echo esc_attr( $module_id ); ?>"
