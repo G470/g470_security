@@ -54,4 +54,52 @@ if ( ! $module ) {
 		submit_button();
 		?>
 	</form>
+
+	<?php if ( 'rest_users_protection' === $module_id ) : ?>
+		<hr />
+		<h2><?php esc_html_e( 'Test REST Users Protection', 'g470-gatonet-plugins' ); ?></h2>
+		<p class="description">
+			<?php esc_html_e( 'Click to simulate access outcome for the current user with the saved settings.', 'g470-gatonet-plugins' ); ?>
+		</p>
+		<button id="g470-test-button" class="button">
+			<?php esc_html_e( 'Run Test', 'g470-gatonet-plugins' ); ?>
+		</button>
+		<span id="g470-test-spinner" class="spinner" style="float:none; visibility:hidden;"></span>
+		<div id="g470-test-result" style="margin-top:10px;"></div>
+
+		<script type="text/javascript">
+			(function($){
+				var $btn = $('#g470-test-button');
+				var $spinner = $('#g470-test-spinner');
+				var $result = $('#g470-test-result');
+				var nonce = '<?php echo esc_js( wp_create_nonce( 'g470_test_rest_users_protection' ) ); ?>';
+				$btn.on('click', function(e){
+					e.preventDefault();
+					$btn.prop('disabled', true);
+					$spinner.css('visibility', 'visible');
+					$result.text('<?php echo esc_js( __( 'Testing...', 'g470-gatonet-plugins' ) ); ?>');
+					$.post(ajaxurl, {
+						action: 'g470_test_rest_users_protection',
+						nonce: nonce
+					})
+					.done(function(resp){
+						if (resp && resp.success && resp.data) {
+							var data = resp.data;
+							var msg = data.message + ' ' + '(status: ' + data.http_status + ', mode: ' + data.protection_mode + ', required cap: ' + data.required_cap + ')';
+							$result.text(msg);
+						} else {
+							$result.text('<?php echo esc_js( __( 'Test failed. Please try again.', 'g470-gatonet-plugins' ) ); ?>');
+						}
+					})
+					.fail(function(){
+						$result.text('<?php echo esc_js( __( 'Request error. Please check your network.', 'g470-gatonet-plugins' ) ); ?>');
+					})
+					.always(function(){
+						$btn.prop('disabled', false);
+						$spinner.css('visibility', 'hidden');
+					});
+				});
+			})(jQuery);
+		</script>
+	<?php endif; ?>
 </div>

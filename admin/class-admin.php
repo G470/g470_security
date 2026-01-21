@@ -44,6 +44,7 @@ class G470_Security_Admin {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'wp_ajax_g470_toggle_module', array( $this, 'ajax_toggle_module' ) );
+		add_action( 'wp_ajax_g470_test_rest_users_protection', array( $this, 'ajax_test_rest_users_protection' ) );
 	}
 
 	/**
@@ -182,5 +183,82 @@ class G470_Security_Admin {
 		} else {
 			wp_send_json_error( array( 'message' => __( 'Failed to toggle module. It may be locked.', 'g470-gatonet-plugins' ) ) );
 		}
+	}
+
+	/**
+	 * AJAX handler to test REST Users Protection behavior.
+	 *
+	 * Predicts the outcome for the current user based on settings
+	 * without performing an external HTTP request.
+	 *
+	 * @since 1.0.2
+	 */
+	public function ajax_test_rest_users_protection() {
+		// Verify nonce.
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'g470_test_rest_users_protection' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'g470-gatonet-plugins' ) ) );
+		}
+
+		// Check capability.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'g470-gatonet-plugins' ) ) );
+		}
+
+		$options = $this->settings->get_options();
+
+		$enabled         = ! empty( $options['g470_security_enabled'] );
+		$required_cap    = ! empty( $options['g470_security_capability'] ) ? $options['g470_security_capability'] : 'list_users';
+		$protection_mode = ! empty( $options['g470_security_protection_mode'] ) ? $options['g470_security_protection_mode'] : 'block';
+
+		$current_is_logged_in = is_user_logged_in();
+		$current_has_cap      = $current_is_logged_in && current_user_can( $required_cap );
+
+		$result = array(
+			'enabled'         => $enabled,
+			'protection_mode' => $protection_mode,
+			'required_cap'    => $required_cap,
+			'is_logged_in'    => $current_is_logged_in,
+			'has_cap'         => $current_has_cap,
+		);
+
+		if ( ! $enabled ) {
+			$result['outcome']     = 'disabled';
+			$result['http_status'] = 200;
+			$result['message']     = __( 'Protection is disabled. Endpoint behaves as core.', 'g470-gatonet-plugins' );
+			wp_send_json_success( $result );
+		}
+
+		if ( 'sanitize' === $protection_mode ) {
+			if ( $current_has_cap ) {
+				$result['outcome']     = 'allowed';
+				$result['http_status'] = 200;
+				$result['message']     = __( 'Access allowed. Data will be full for authorized users.', 'g470-gatonet-plugins' );
+			} else {
+				$result['outcome']     = 'sanitized';
+				$result['http_status'] = 200;
+				$result['message']     = __( 'Access allowed but data will be sanitized for unauthorized users.', 'g470-gatonet-plugins' );
+			}
+			wp_send_json_success( $result );
+		}
+
+		// Block mode.
+		if ( ! $current_is_logged_in ) {
+			$result['outcome']     = 'blocked';
+			$result['http_status'] = 401;
+			$result['message']     = __( 'Blocked: guest users receive 401.', 'g470-gatonet-plugins' );
+			wp_send_json_success( $result );
+		}
+
+		if ( ! $current_has_cap ) {
+			$result['outcome']     = 'blocked';
+			$result['http_status'] = 403;
+			$result['message']     = __( 'Blocked: logged-in without required capability receive 403.', 'g470-gatonet-plugins' );
+			wp_send_json_success( $result );
+		}
+
+		$result['outcome']     = 'allowed';
+		$result['http_status'] = 200;
+		$result['message']     = __( 'Access allowed: user has required capability.', 'g470-gatonet-plugins' );
+		wp_send_json_success( $result );
 	}
 }
