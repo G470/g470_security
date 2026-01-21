@@ -26,7 +26,7 @@ if ( ! $module ) {
 	<h1>
 		<?php echo esc_html( get_admin_page_title() ); ?> 
 		<span class="subtitle" style="font-size: 14px; font-weight: normal; color: #666;">
-			<?php echo esc_html( $module['name'] ); ?>
+			<?php echo esc_html__( $module['name'], 'g470-gatonet-plugins' ); ?>
 		</span>
 	</h1>
 

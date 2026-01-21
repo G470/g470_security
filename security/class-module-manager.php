@@ -54,8 +54,9 @@ class G470_Security_Module_Manager {
 		$this->register_module(
 			'rest_users_protection',
 			array(
-				'name'        => __( 'REST Users Protection', 'g470-gatonet-plugins' ),
-				'description' => __( 'Restrict access to /wp/v2/users REST endpoint based on capabilities.', 'g470-gatonet-plugins' ),
+				// Store raw strings; translate at render time to avoid early JIT loading.
+				'name'        => 'REST Users Protection',
+				'description' => 'Restrict access to /wp/v2/users REST endpoint based on capabilities.',
 				'enabled'     => true,
 				'locked'      => false, // Can be disabled by admin
 				'has_settings' => true,

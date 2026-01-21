@@ -29,12 +29,12 @@ $modules        = $module_manager->get_modules();
 					<div class="g470-module-header">
 						<div class="g470-module-info">
 							<h3>
-								<?php echo esc_html( $module['name'] ); ?>
+								<?php echo esc_html__( $module['name'], 'g470-gatonet-plugins' ); ?>
 								<?php if ( $is_locked ) : ?>
 									<span class="dashicons dashicons-lock" title="<?php esc_attr_e( 'Core module (cannot be disabled)', 'g470-gatonet-plugins' ); ?>"></span>
 								<?php endif; ?>
 							</h3>
-							<p><?php echo esc_html( $module['description'] ); ?></p>
+							<p><?php echo esc_html__( $module['description'], 'g470-gatonet-plugins' ); ?></p>
 						</div>
 						<div class="g470-module-toggle">
 							<?php if ( $is_locked ) : ?>
