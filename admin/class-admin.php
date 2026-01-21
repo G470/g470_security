@@ -229,6 +229,10 @@ class G470_Security_Admin {
 				$sim_is_logged_in = true;
 				$sim_has_cap      = false;
 				break;
+			case 'has_cap':
+				$sim_is_logged_in = true;
+				$sim_has_cap      = true;
+				break;
 			case 'current':
 			default:
 				// Use actual current user context.

@@ -98,6 +98,7 @@ git push origin v1.0.1
 
 ## Changelog
 
+- **1.0.4** (2026-01-21): Test tool adds scenario for Logged-in with required capability to round out simulations.
 - **1.0.3** (2026-01-21): Test tool now supports scenario selection (Guest and Logged-in without required capability) to simulate outcomes without changing user state.
 - **1.0.2** (2026-01-21): Added Test button in REST Users Protection module to simulate access outcome for the current user; minor admin improvements.
 - **1.0.1** (2026-01-21): Version bump release to publish a new GitHub tag so WordPress installations can see the available update.

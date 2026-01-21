@@ -68,6 +68,7 @@ if ( ! $module ) {
 			<option value="current"><?php esc_html_e( 'Current User', 'g470-gatonet-plugins' ); ?></option>
 			<option value="guest"><?php esc_html_e( 'Guest (not logged in)', 'g470-gatonet-plugins' ); ?></option>
 			<option value="no_cap"><?php esc_html_e( 'Logged-in without required capability', 'g470-gatonet-plugins' ); ?></option>
+			<option value="has_cap"><?php esc_html_e( 'Logged-in with required capability', 'g470-gatonet-plugins' ); ?></option>
 		</select>
 		<button id="g470-test-button" class="button">
 			<?php esc_html_e( 'Run Test', 'g470-gatonet-plugins' ); ?>
@@ -98,7 +99,8 @@ if ( ! $module ) {
 							var labelMap = {
 								current: '<?php echo esc_js( __( 'Current User', 'g470-gatonet-plugins' ) ); ?>',
 								guest: '<?php echo esc_js( __( 'Guest', 'g470-gatonet-plugins' ) ); ?>',
-								no_cap: '<?php echo esc_js( __( 'No Capability', 'g470-gatonet-plugins' ) ); ?>'
+								no_cap: '<?php echo esc_js( __( 'No Capability', 'g470-gatonet-plugins' ) ); ?>',
+								has_cap: '<?php echo esc_js( __( 'Has Required Capability', 'g470-gatonet-plugins' ) ); ?>'
 							};
 							var scenarioLabel = labelMap[data.scenario] || data.scenario;
 							var msg = '[' + scenarioLabel + '] ' + data.message + ' ' + '(status: ' + data.http_status + ', mode: ' + data.protection_mode + ', required cap: ' + data.required_cap + ')';
