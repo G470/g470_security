@@ -17,229 +17,176 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Default options
  */
-function rup_default_options() {
+function g470_security_default_options() {
     return array(
-        'rup_enabled'    => true,
-        'rup_capability' => 'list_users',
+        'g470_security_enabled'    => true,
+        'g470_security_capability' => 'list_users',
     );
-}
-
-/**
- * Internal cache helper to avoid repeated file reads per request.
- */
-function rup_cached_options( $value = null, $reset = false ) {
-    static $cache = null;
-
-    if ( $reset ) {
-        $cache = null;
-    } elseif ( null !== $value ) {
-        $cache = $value;
-    }
-
-    return $cache;
-}
-
-/**
- * Location of the settings directory inside uploads.
- */
-function rup_settings_dir() {
-    $upload_dir = wp_upload_dir();
-
-    return trailingslashit( $upload_dir['basedir'] ) . 'g470-security';
-}
-
-/**
- * Full path to the settings JSON file.
- */
-function rup_settings_file() {
-    return trailingslashit( rup_settings_dir() ) . 'settings.json';
 }
 
 /**
  * Sanitize the options before saving.
  */
-function rup_sanitize_options( $input ) {
-    $defaults = rup_default_options();
+function g470_security_sanitize_options( $input ) {
+    $defaults = g470_security_default_options();
     $output   = array();
 
-    $output['rup_enabled'] = ! empty( $input['rup_enabled'] );
+    $output['g470_security_enabled'] = ! empty( $input['g470_security_enabled'] );
 
-    if ( isset( $input['rup_capability'] ) ) {
-        $cap = sanitize_text_field( $input['rup_capability'] );
+    if ( isset( $input['g470_security_capability'] ) ) {
+        $cap = sanitize_text_field( $input['g470_security_capability'] );
         $cap = preg_replace( '/[^a-z0-9_\-]/', '', $cap );
-        $output['rup_capability'] = ! empty( $cap ) ? $cap : $defaults['rup_capability'];
+        $allowed = g470_security_get_available_capabilities();
+        $output['g470_security_capability'] = ( ! empty( $cap ) && in_array( $cap, $allowed, true ) ) ? $cap : $defaults['g470_security_capability'];
     } else {
-        $output['rup_capability'] = $defaults['rup_capability'];
+        $output['g470_security_capability'] = $defaults['g470_security_capability'];
     }
 
     return $output;
 }
 
 /**
- * Load settings from the JSON file or fall back to defaults.
+ * Aggregate available capabilities from roles plus a set of common caps.
  */
-function rup_load_options() {
-    $cached = rup_cached_options();
-
-    if ( null !== $cached ) {
-        return $cached;
+function g470_security_get_available_capabilities() {
+    static $caps = null;
+    if ( null !== $caps ) {
+        return $caps;
     }
 
-    $defaults = rup_default_options();
-    $file     = rup_settings_file();
-    $options  = $defaults;
+    $caps_set = array();
 
-    if ( is_readable( $file ) ) {
-        $contents = file_get_contents( $file );
+    // Common core capabilities to ensure useful defaults
+    $common = array(
+        'read',
+        'list_users',
+        'manage_options',
+        'edit_posts',
+        'edit_pages',
+        'publish_posts',
+        'delete_posts',
+        'moderate_comments',
+        'install_plugins',
+        'activate_plugins',
+        'edit_theme_options',
+        'manage_categories',
+    );
+    foreach ( $common as $c ) {
+        $caps_set[ $c ] = true;
+    }
 
-        if ( false !== $contents ) {
-            $decoded = json_decode( $contents, true );
-
-            if ( is_array( $decoded ) ) {
-                $options = wp_parse_args( $decoded, $defaults );
+    // Pull capabilities from all registered roles
+    $wp_roles = wp_roles();
+    if ( $wp_roles instanceof WP_Roles ) {
+        foreach ( $wp_roles->roles as $role ) {
+            if ( isset( $role['capabilities'] ) && is_array( $role['capabilities'] ) ) {
+                foreach ( $role['capabilities'] as $cap => $grant ) {
+                    $caps_set[ $cap ] = true;
+                }
             }
         }
     }
 
-    $options = rup_sanitize_options( $options );
-    rup_cached_options( $options );
-
-    return $options;
+    $caps = array_keys( $caps_set );
+    sort( $caps, SORT_STRING | SORT_FLAG_CASE );
+    return $caps;
 }
 
 /**
- * Persist sanitized settings to a JSON file.
+ * Register the settings in WP Settings API.
  */
-function rup_save_options( array $input ) {
-    $options = rup_sanitize_options( $input );
-    $dir     = rup_settings_dir();
+function g470_security_register_settings() {
+    register_setting(
+        'g470_security_settings_group',
+        'g470_security_options',
+        'g470_security_sanitize_options'
+    );
 
-    if ( ! wp_mkdir_p( $dir ) ) {
-        return new WP_Error( 'rup_cannot_create_dir', __( 'Cannot create the G470 Security settings directory.', 'rest-users-protect' ) );
-    }
+    add_settings_section(
+        'g470_security_main_section',
+        __( 'G470 SEC Settings', 'rest-users-protect' ),
+        null,
+        'g470_security_settings_page'
+    );
 
-    $file = rup_settings_file();
-    $json = wp_json_encode( $options, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+    add_settings_field(
+        'g470_security_enabled',
+        __( 'Enable Restriction', 'rest-users-protect' ),
+        'g470_security_enabled_callback',
+        'g470_security_settings_page',
+        'g470_security_main_section'
+    );
 
-    if ( false === $json ) {
-        return new WP_Error( 'rup_encode_failed', __( 'Could not encode settings to JSON.', 'rest-users-protect' ) );
-    }
+    add_settings_field(
+        'g470_security_capability',
+        __( 'Required Capability', 'rest-users-protect' ),
+        'g470_security_capability_callback',
+        'g470_security_settings_page',
+        'g470_security_main_section'
+    );
+}
+add_action( 'admin_init', 'g470_security_register_settings' );
 
-    $bytes = file_put_contents( $file, $json, LOCK_EX );
+/**
+ * Settings page callback – enable checkbox.
+ */
+function g470_security_enabled_callback() {
+    $options = get_option( 'g470_security_options', g470_security_default_options() );
+    ?>
+    <input type="checkbox" id="g470_security_enabled" name="g470_security_options[g470_security_enabled]" value="1" <?php checked( true, ! empty( $options['g470_security_enabled'] ) ); ?> />
+    <label for="g470_security_enabled"><?php esc_html_e( 'Enable restriction on the /wp/v2/users endpoint', 'rest-users-protect' ); ?></label>
+    <?php
+}
 
-    if ( false === $bytes ) {
-        return new WP_Error( 'rup_write_failed', __( 'Could not write the settings file.', 'rest-users-protect' ) );
-    }
-
-    rup_cached_options( $options, true );
-    rup_cached_options( $options );
-
-    return $options;
+/**
+ * Settings page callback – capability field.
+ */
+function g470_security_capability_callback() {
+    $options      = get_option( 'g470_security_options', g470_security_default_options() );
+    $capabilities = g470_security_get_available_capabilities();
+    ?>
+    <select id="g470_security_capability" name="g470_security_options[g470_security_capability]">
+        <?php foreach ( $capabilities as $cap ) : ?>
+            <option value="<?php echo esc_attr( $cap ); ?>" <?php selected( $options['g470_security_capability'], $cap ); ?>>
+                <?php echo esc_html( $cap ); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+    <p class="description"><?php esc_html_e( 'Choose a capability required to view the users endpoint.', 'rest-users-protect' ); ?></p>
+    <?php
 }
 
 /**
  * Add Settings page to WP-Admin.
  */
-function rup_admin_menu() {
+function g470_security_admin_menu() {
     add_options_page(
-        __( 'REST Users Protect', 'rest-users-protect' ),
-        __( 'REST Users Protect', 'rest-users-protect' ),
+        __( 'G470 SEC', 'rest-users-protect' ),
+        __( 'G470 SEC', 'rest-users-protect' ),
         'manage_options',
-        'rup-settings',
-        'rup_settings_page'
+        'g470_sec-settings',
+        'g470_security_settings_page'
     );
 }
-add_action( 'admin_menu', 'rup_admin_menu' );
+add_action( 'admin_menu', 'g470_security_admin_menu' );
 
-/**
- * Handle settings form submissions and persist to the JSON file.
- */
-function rup_handle_settings_save() {
-    if ( ! current_user_can( 'manage_options' ) ) {
-        wp_die( esc_html__( 'You are not allowed to perform this action.', 'rest-users-protect' ) );
-    }
-
-    check_admin_referer( 'rup_save_settings' );
-
-    $raw     = isset( $_POST['rup_options'] ) ? (array) wp_unslash( $_POST['rup_options'] ) : array();
-    $options = array(
-        'rup_enabled'    => ! empty( $raw['rup_enabled'] ),
-        'rup_capability' => isset( $raw['rup_capability'] ) ? $raw['rup_capability'] : '',
-    );
-
-    $result = rup_save_options( $options );
-
-    $redirect_args = array( 'page' => 'rup-settings' );
-
-    if ( is_wp_error( $result ) ) {
-        $redirect_args['rup_error'] = rawurlencode( $result->get_error_message() );
-    } else {
-        $redirect_args['rup_updated'] = '1';
-    }
-
-    $redirect_url = add_query_arg( $redirect_args, admin_url( 'options-general.php' ) );
-
-    wp_safe_redirect( $redirect_url );
-    exit;
-}
-add_action( 'admin_post_rup_save_settings', 'rup_handle_settings_save' );
-
-/**
- * Render admin notices for save results.
- */
-function rup_admin_notices() {
-    if ( ! isset( $_GET['page'] ) || 'rup-settings' !== $_GET['page'] ) {
-        return;
-    }
-
-    if ( isset( $_GET['rup_updated'] ) ) {
-        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved to file.', 'rest-users-protect' ) . '</p></div>';
-    }
-
-    if ( isset( $_GET['rup_error'] ) ) {
-        $message = sanitize_text_field( wp_unslash( $_GET['rup_error'] ) );
-        echo '<div class="notice notice-error"><p>' . esc_html( $message ) . '</p></div>';
-    }
-}
-add_action( 'admin_notices', 'rup_admin_notices' );
+// No custom admin-post handler needed; using Settings API submission via options.php.
 
 /**
  * Render the settings page.
  */
-function rup_settings_page() {
-    $options = rup_load_options();
+function g470_security_settings_page() {
+    $options = get_option( 'g470_security_options', g470_security_default_options() );
     ?>
     <div class="wrap">
-        <h1><?php esc_html_e( 'REST Users Protect', 'rest-users-protect' ); ?></h1>
+        <h1><?php esc_html_e( 'G470 SEC', 'rest-users-protect' ); ?></h1>
 
-        <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-            <?php wp_nonce_field( 'rup_save_settings' ); ?>
-            <input type="hidden" name="action" value="rup_save_settings" />
-
-            <table class="form-table" role="presentation">
-                <tbody>
-                    <tr>
-                        <th scope="row">
-                            <label for="rup_enabled"><?php esc_html_e( 'Enable Restriction', 'rest-users-protect' ); ?></label>
-                        </th>
-                        <td>
-                            <input type="checkbox" id="rup_enabled" name="rup_options[rup_enabled]" value="1" <?php checked( true, $options['rup_enabled'] ); ?> />
-                            <p class="description"><?php esc_html_e( 'Enable restriction on the /wp/v2/users endpoint.', 'rest-users-protect' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            <label for="rup_capability"><?php esc_html_e( 'Required Capability', 'rest-users-protect' ); ?></label>
-                        </th>
-                        <td>
-                            <input type="text" id="rup_capability" name="rup_options[rup_capability]" value="<?php echo esc_attr( $options['rup_capability'] ); ?>" class="regular-text" />
-                            <p class="description"><?php esc_html_e( 'Only users with this capability can view the users endpoint. Leave empty to use the default capability (list_users).', 'rest-users-protect' ); ?></p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <?php submit_button( __( 'Save Settings', 'rest-users-protect' ) ); ?>
+        <form method="post" action="options.php">
+            <?php
+            settings_fields( 'g470_security_settings_group' );
+            do_settings_sections( 'g470_security_settings_page' );
+            submit_button();
+            ?>
         </form>
     </div>
     <?php
@@ -248,18 +195,18 @@ function rup_settings_page() {
 /**
  * REST endpoint filter – block public access
  */
-function rup_rest_pre_dispatch( $result, $server, $check, $route, $verb ) {
+function g470_security_rest_pre_dispatch( $result, $server, $check, $route, $verb ) {
     if ( '/wp/v2/users' !== $route ) {
         return $result;
     }
 
-    $options = rup_load_options();
+    $options = wp_parse_args( get_option( 'g470_security_options', array() ), g470_security_default_options() );
 
-    if ( empty( $options['rup_enabled'] ) ) {
+    if ( empty( $options['g470_security_enabled'] ) ) {
         return $result;
     }
 
-    $required_cap = ! empty( $options['rup_capability'] ) ? $options['rup_capability'] : 'list_users';
+    $required_cap = ! empty( $options['g470_security_capability'] ) ? $options['g470_security_capability'] : 'list_users';
 
     if ( ! is_user_logged_in() || ! current_user_can( $required_cap ) ) {
         return new WP_Error(
@@ -271,28 +218,22 @@ function rup_rest_pre_dispatch( $result, $server, $check, $route, $verb ) {
 
     return $result;
 }
-add_filter( 'rest_pre_dispatch', 'rup_rest_pre_dispatch', 10, 5 );
+add_filter( 'rest_pre_dispatch', 'g470_security_rest_pre_dispatch', 10, 5 );
 
 /**
- * Activate: ensure settings file exists with defaults.
+ * Activate: ensure option exists with defaults.
  */
-function rup_activate() {
-    $result = rup_save_options( rup_default_options() );
-
-    if ( is_wp_error( $result ) ) {
-        error_log( 'G470 Security activation: ' . $result->get_error_message() );
+function g470_security_activate() {
+    if ( ! get_option( 'g470_security_options' ) ) {
+        add_option( 'g470_security_options', g470_security_default_options() );
     }
 }
-register_activation_hook( __FILE__, 'rup_activate' );
+register_activation_hook( __FILE__, 'g470_security_activate' );
 
 /**
- * Deactivate: clean up settings file.
+ * Deactivate: clean up option.
  */
-function rup_deactivate() {
-    $file = rup_settings_file();
-
-    if ( is_file( $file ) ) {
-        unlink( $file );
-    }
+function g470_security_deactivate() {
+    delete_option( 'g470_security_options' );
 }
-register_deactivation_hook( __FILE__, 'rup_deactivate' );
+register_deactivation_hook( __FILE__, 'g470_security_deactivate' );
