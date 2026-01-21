@@ -27,6 +27,8 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  */
 function g470_security_uninstall() {
 	// Remove plugin options.
+	//
+	
 	delete_option( 'g470_security_options' );
 
 	// For multisite installations, remove options from all sites.
@@ -44,4 +46,4 @@ function g470_security_uninstall() {
 	}
 }
 
-g470_security_uninstall();
+// g470_security_uninstall();
