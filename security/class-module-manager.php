@@ -64,6 +64,20 @@ class G470_Security_Module_Manager {
 				'class'       => 'G470_Security_REST_Security',
 			)
 		);
+
+		// ACF Field Debugging for Elementor
+		$this->register_module(
+			'acf_debug',
+			array(
+				'name'        => 'ACF Field Debugging',
+				'description' => 'Log warnings when ACF fields return improperly indexed arrays in Elementor Pro dynamic tags.',
+				'enabled'     => false,
+				'locked'      => false,
+				'has_settings' => false,
+				'settings_callback' => null,
+				'class'       => 'G470_Security_ACF_Debug',
+			)
+		);
 	}
 
 	/**

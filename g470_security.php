@@ -3,7 +3,7 @@
  * Plugin Name:       G470 Security
  * Description:       Custom security related Plugin
  * Author:            G470
- * Version:           1.0.4
+ * Version:           1.0.5
  * Requires at least: 6.0
  * Requires PHP:      8.1
  * Author URI:        https://gatonet.de/wordpress-support
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define plugin constants.
  */
-define( 'G470_SECURITY_VERSION', '1.0.4' );
+define( 'G470_SECURITY_VERSION', '1.0.5' );
 define( 'G470_SECURITY_PATH', plugin_dir_path( __FILE__ ) );
 define( 'G470_SECURITY_URL', plugin_dir_url( __FILE__ ) );
 define( 'G470_SECURITY_BASENAME', plugin_basename( __FILE__ ) );

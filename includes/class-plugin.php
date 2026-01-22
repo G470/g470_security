@@ -40,6 +40,13 @@ class G470_Security_Plugin {
 	protected $rest_security;
 
 	/**
+	 * ACF debug manager instance.
+	 *
+	 * @var G470_Security_ACF_Debug
+	 */
+	protected $acf_debug;
+
+	/**
 	 * Plugin updater instance.
 	 *
 	 * @var G470_Security_Updater
@@ -94,6 +101,7 @@ class G470_Security_Plugin {
 		require_once G470_SECURITY_PATH . 'security/class-capability-manager.php';
 		require_once G470_SECURITY_PATH . 'security/class-module-manager.php';
 		require_once G470_SECURITY_PATH . 'security/class-rest-security.php';
+		require_once G470_SECURITY_PATH . 'security/class-acf-debug.php';
 
 		// Admin classes.
 		require_once G470_SECURITY_PATH . 'admin/class-settings.php';
@@ -127,6 +135,9 @@ class G470_Security_Plugin {
 
 		// REST API security (always active).
 		$this->rest_security = new G470_Security_REST_Security( $this->settings );
+
+		// ACF debugging (conditionally active based on module settings).
+		$this->acf_debug = new G470_Security_ACF_Debug( $this->settings );
 
 		// Plugin updater (always active).
 		$this->updater = new G470_Security_Updater( $this->settings );
